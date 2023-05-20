@@ -2,6 +2,7 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
+[RequireComponent(typeof(AudioSource))]
 public class GameController : MonoBehaviour
 {
     //10*10のint型２次元配列を定義
@@ -23,6 +24,11 @@ public class GameController : MonoBehaviour
     public GameObject whiteStone;
     public GameObject blackStone;
 
+    [SerializeField] AudioClip[] clips;
+    [SerializeField] float pitchRange = 0.1f;
+    public AudioClip sound;
+    AudioSource audioSource;
+
     // Start is called before the first frame update
     void Start()
     {
@@ -34,6 +40,8 @@ public class GameController : MonoBehaviour
 
         //デバッグ用メソッド
         //DebugArray();
+
+        audioSource = GetComponent<AudioSource>();
     }
 
     // Update is called once per frame
@@ -64,6 +72,9 @@ public class GameController : MonoBehaviour
                         //Stoneを出力
                         GameObject stone = Instantiate(whiteStone);
                         stone.transform.position = hit.collider.gameObject.transform.position;
+                        audioSource.PlayOneShot(sound);
+
+
 
                         //Playerを交代
                         currentPlayer = BLACK;
@@ -77,6 +88,7 @@ public class GameController : MonoBehaviour
                         //Stoneを出力
                         GameObject stone = Instantiate(blackStone);
                         stone.transform.position = hit.collider.gameObject.transform.position;
+                        audioSource.PlayOneShot(sound);
 
                         //Playerを交代
                         currentPlayer = WHITE;
