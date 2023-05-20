@@ -26,8 +26,17 @@ public class GameController : MonoBehaviour
 
     [SerializeField] AudioClip[] clips;
     [SerializeField] float pitchRange = 0.1f;
-    public AudioClip sound;
+    public AudioClip sound;//石を置くときの音
+    public AudioClip sound2;//勝った時の音
     AudioSource audioSource;
+
+    public GameObject particleObject;//石を置くときのエフェクト
+    public GameObject particleObject2;//勝った時のエフェクト
+    public GameObject particleObject3;//勝った時のエフェクト
+    public GameObject particleObject4;//勝った時のエフェクト
+    private Vector3 pos;
+    private int tmp =0;
+    
 
     // Start is called before the first frame update
     void Start()
@@ -73,6 +82,9 @@ public class GameController : MonoBehaviour
                         GameObject stone = Instantiate(whiteStone);
                         stone.transform.position = hit.collider.gameObject.transform.position;
                         audioSource.PlayOneShot(sound);
+                        pos = stone.transform.position;
+                        pos.y += 1.0f;
+                        Instantiate(particleObject, pos, Quaternion.identity); //パーティクル用ゲームオブジェクト生成
 
 
 
@@ -89,6 +101,10 @@ public class GameController : MonoBehaviour
                         GameObject stone = Instantiate(blackStone);
                         stone.transform.position = hit.collider.gameObject.transform.position;
                         audioSource.PlayOneShot(sound);
+                        pos = stone.transform.position;
+                        pos.y += 1.0f;
+                        Instantiate(particleObject, pos, Quaternion.identity); //パーティクル用ゲームオブジェクト生成
+
 
                         //Playerを交代
                         currentPlayer = WHITE;
@@ -98,8 +114,17 @@ public class GameController : MonoBehaviour
         }
 
         //碁石が揃っているかどうか確認する
-        if (CheckStone(WHITE) || CheckStone(BLACK))
+        if ((CheckStone(WHITE) || CheckStone(BLACK)) && tmp ==0)
         {
+            //os.y -= 1.0f;
+            //Instantiate(particleObject2, pos, Quaternion.identity);
+            //Instantiate(particleObject3, pos, Quaternion.identity);
+            Quaternion rotation = Quaternion.Euler(270, 0, 0);  // Y軸周りに45度回転
+            Instantiate(particleObject4, pos, rotation);
+            audioSource.PlayOneShot(sound2);
+
+            tmp = 1;
+
             return;
         }
 
@@ -126,7 +151,7 @@ public class GameController : MonoBehaviour
     }
 
     //配列情報を確認する（デバッグ用）
-    /*     private void DebugArray()
+         private void DebugArray()
         {
             for (int i = 0; i < 10; i++)
             {
@@ -135,7 +160,7 @@ public class GameController : MonoBehaviour
                     Debug.Log("(i,j) = (" + i + "," + j + ") = " + squares[i, j]);
                 }
             }
-        } */
+        } 
 
     //5個連続で碁石が置かれているか確認する(colorに判定する色を渡す)
     private bool CheckStone(int color)
@@ -159,6 +184,8 @@ public class GameController : MonoBehaviour
                     //countにsquaresの値を格納する
                     count++;
                 }
+
+                
 
                 //countの値が5になったとき
                 if (count == 5)
@@ -306,6 +333,10 @@ public class GameController : MonoBehaviour
 
         //まだ判定がついていないとき
         return false;
+    }
+
+    private void Finish(){
+
     }
 
 
