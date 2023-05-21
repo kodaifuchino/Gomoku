@@ -1,6 +1,7 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.UI;
 
 [RequireComponent(typeof(AudioSource))]
 public class GameController : MonoBehaviour
@@ -35,7 +36,12 @@ public class GameController : MonoBehaviour
     public GameObject particleObject3;//勝った時のエフェクト
     public GameObject particleObject4;//勝った時のエフェクト
     private Vector3 pos;
-    private int tmp =0;
+    public int finish_flg =0;
+    public string message="White's Turn!";
+    public Text textObject;
+    [SerializeField] private string loadScene="Menu 3D 1";
+    [SerializeField] private Color fadeColor = Color.black;
+    [SerializeField] private float fadeSpeedMultiplier = 1.5f;
     
 
     // Start is called before the first frame update
@@ -46,94 +52,117 @@ public class GameController : MonoBehaviour
 
         //配列を初期化
         InitializeArray();
+        finish_flg =0;
 
         //デバッグ用メソッド
         //DebugArray();
 
         audioSource = GetComponent<AudioSource>();
+
+        textObject.text = "White's Turn!";
     }
 
     // Update is called once per frame
     void Update()
     {
-        //マウスがクリックされたとき
-        if (Input.GetMouseButtonDown(0))
-        {
-            //マウスのポジションを取得してRayに代入
-            Ray ray = camera_object.ScreenPointToRay(Input.mousePosition);
-
-            //マウスのポジションからRayを投げて何かに当たったらhitに入れる
-            if (Physics.Raycast(ray, out hit))
+        if(finish_flg == 0){
+            //マウスがクリックされたとき
+            if (Input.GetMouseButtonDown(0))
             {
-                //x,zの値を取得
-                int x = (int)hit.collider.gameObject.transform.position.x;
-                int z = (int)hit.collider.gameObject.transform.position.z;
+                //マウスのポジションを取得してRayに代入
+                Ray ray = camera_object.ScreenPointToRay(Input.mousePosition);
 
-                //マスが空のとき
-                if (squares[z, x] == EMPTY)
+                //マウスのポジションからRayを投げて何かに当たったらhitに入れる
+                if (Physics.Raycast(ray, out hit))
                 {
-                    //白のターンのとき
-                    if (currentPlayer == WHITE)
+                    //x,zの値を取得
+                    int x = (int)hit.collider.gameObject.transform.position.x;
+                    int z = (int)hit.collider.gameObject.transform.position.z;
+
+                    //マスが空のとき
+                    if (squares[z, x] == EMPTY)
                     {
-                        //Squaresの値を更新
-                        squares[z, x] = WHITE;
+                        //白のターンのとき
+                        if (currentPlayer == WHITE)
+                        {
+                            
+                            //Squaresの値を更新
+                            squares[z, x] = WHITE;
 
-                        //Stoneを出力
-                        GameObject stone = Instantiate(whiteStone);
-                        stone.transform.position = hit.collider.gameObject.transform.position;
-                        audioSource.PlayOneShot(sound);
-                        pos = stone.transform.position;
-                        pos.y += 1.0f;
-                        Instantiate(particleObject, pos, Quaternion.identity); //パーティクル用ゲームオブジェクト生成
-
-
-
-                        //Playerを交代
-                        currentPlayer = BLACK;
-                    }
-                    //黒のターンのとき
-                    else if (currentPlayer == BLACK)
-                    {
-                        //Squaresの値を更新
-                        squares[z, x] = BLACK;
-
-                        //Stoneを出力
-                        GameObject stone = Instantiate(blackStone);
-                        stone.transform.position = hit.collider.gameObject.transform.position;
-                        audioSource.PlayOneShot(sound);
-                        pos = stone.transform.position;
-                        pos.y += 1.0f;
-                        Instantiate(particleObject, pos, Quaternion.identity); //パーティクル用ゲームオブジェクト生成
+                            //Stoneを出力
+                            GameObject stone = Instantiate(whiteStone);
+                            stone.transform.position = hit.collider.gameObject.transform.position;
+                            audioSource.PlayOneShot(sound);
+                            pos = stone.transform.position;
+                            pos.y += 1.0f;
+                            Instantiate(particleObject, pos, Quaternion.identity); //パーティクル用ゲームオブジェクト生成
 
 
-                        //Playerを交代
-                        currentPlayer = WHITE;
+
+                            //Playerを交代
+                            currentPlayer = BLACK;
+                            message = "Black's Turn!";
+                            textObject.text = "Black's Turn!";
+                        }
+                        //黒のターンのとき
+                        else if (currentPlayer == BLACK)
+                        {
+                            
+                            //Squaresの値を更新
+                            squares[z, x] = BLACK;
+
+                            //Stoneを出力
+                            GameObject stone = Instantiate(blackStone);
+                            stone.transform.position = hit.collider.gameObject.transform.position;
+                            audioSource.PlayOneShot(sound);
+                            pos = stone.transform.position;
+                            pos.y += 1.0f;
+                            Instantiate(particleObject, pos, Quaternion.identity); //パーティクル用ゲームオブジェクト生成
+
+
+                            //Playerを交代
+                            currentPlayer = WHITE;
+                            message = "White's Turn!";
+                            textObject.text = "White's Turn!";
+                        }
                     }
                 }
             }
+
+            //碁石が揃っているかどうか確認する
+            if (CheckStone(WHITE) || CheckStone(BLACK)){
+                if(CheckStone(WHITE)){
+                    Debug.Log("白の勝ち！！！");
+                    message = "White Win!!";
+                    textObject.text = "White Win!";
+                }
+                if(CheckStone(BLACK)){
+                    Debug.Log("黒の勝ち！！！");
+                    message = "Black Win!!";
+                    textObject.text = "Black Win!";
+                }
+
+                //os.y -= 1.0f;
+                //Instantiate(particleObject2, pos, Quaternion.identity);
+                //Instantiate(particleObject3, pos, Quaternion.identity);
+                Quaternion rotation = Quaternion.Euler(270, 0, 0);  // Y軸周りに45度回転
+                Instantiate(particleObject4, pos, rotation);
+                audioSource.PlayOneShot(sound2);
+
+                finish_flg = 1;//ゲーム終了を示す
+
+                return;
+            }
+            
+
+            //マウスがクリックされたとき
+            if (Input.GetMouseButtonDown(0))
+            {
+                //マウスのポジションを取得してRayに代入
+                Ray ray = camera_object.ScreenPointToRay(Input.mousePosition);
+            }
         }
-
-        //碁石が揃っているかどうか確認する
-        if ((CheckStone(WHITE) || CheckStone(BLACK)) && tmp ==0)
-        {
-            //os.y -= 1.0f;
-            //Instantiate(particleObject2, pos, Quaternion.identity);
-            //Instantiate(particleObject3, pos, Quaternion.identity);
-            Quaternion rotation = Quaternion.Euler(270, 0, 0);  // Y軸周りに45度回転
-            Instantiate(particleObject4, pos, rotation);
-            audioSource.PlayOneShot(sound2);
-
-            tmp = 1;
-
-            return;
-        }
-
-        //マウスがクリックされたとき
-        if (Input.GetMouseButtonDown(0))
-        {
-            //マウスのポジションを取得してRayに代入
-            Ray ray = camera_object.ScreenPointToRay(Input.mousePosition);
-        }
+        
     }
 
     //配列情報を初期化する
@@ -193,12 +222,12 @@ public class GameController : MonoBehaviour
                     //白のとき
                     if (color == WHITE)
                     {
-                        Debug.Log("白の勝ち！！！");
+                        //Debug.Log("白の勝ち！！！");
                     }
                     //黒のとき
                     else
                     {
-                        Debug.Log("黒の勝ち！！！");
+                        //Debug.Log("黒の勝ち！！！");
                     }
 
                     return true;
@@ -232,12 +261,12 @@ public class GameController : MonoBehaviour
                     //白のとき
                     if (color == WHITE)
                     {
-                        Debug.Log("白の勝ち！！！");
+                        //Debug.Log("白の勝ち！！！");
                     }
                     //黒のとき
                     else
                     {
-                        Debug.Log("黒の勝ち！！！");
+                        //Debug.Log("黒の勝ち！！！");
                     }
 
                     return true;
@@ -273,12 +302,12 @@ public class GameController : MonoBehaviour
                     //白のとき
                     if (color == WHITE)
                     {
-                        Debug.Log("白の勝ち！！！");
+                        //Debug.Log("白の勝ち！！！");
                     }
                     //黒のとき
                     else
                     {
-                        Debug.Log("黒の勝ち！！！");
+                        //Debug.Log("黒の勝ち！！！");
                     }
 
                     return true;
@@ -316,12 +345,12 @@ public class GameController : MonoBehaviour
                     //白のとき
                     if (color == WHITE)
                     {
-                        Debug.Log("白の勝ち！！！");
+                        //Debug.Log("白の勝ち！！！");
                     }
                     //黒のとき
                     else
                     {
-                        Debug.Log("黒の勝ち！！！");
+                        //Debug.Log("黒の勝ち！！！");
                     }
 
                     return true;
@@ -337,6 +366,16 @@ public class GameController : MonoBehaviour
 
     private void Finish(){
 
+    }
+
+    public void PushNewGame()
+    {
+        Initiate.Fade("Gomoku", fadeColor, fadeSpeedMultiplier);
+    }
+
+    public void PushQuit()
+    {
+        Initiate.Fade(loadScene, fadeColor, fadeSpeedMultiplier);
     }
 
 
