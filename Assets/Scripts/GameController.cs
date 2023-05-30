@@ -2,6 +2,7 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
+using UnityEngine.EventSystems;
 
 [RequireComponent(typeof(AudioSource))]
 public class GameController : MonoBehaviour
@@ -42,6 +43,21 @@ public class GameController : MonoBehaviour
     [SerializeField] private string loadScene="Menu 3D 1";
     [SerializeField] private Color fadeColor = Color.black;
     [SerializeField] private float fadeSpeedMultiplier = 1.5f;
+    public Button itembutton;
+    public Button meteorbutton;
+    public Button blackholebutton;
+    public Button zerogravitybutton;
+    public ItemManager itemManager;
+    private bool whiteMeteor = false;
+    private bool whiteBlackHole = false;
+    private bool whiteZeroGravity = false;
+    private bool blackMeteor = false;
+    private bool blackBlackHole = false;
+    private bool blackZeroGravity = false;
+
+
+
+
     
 
     // Start is called before the first frame update
@@ -53,6 +69,16 @@ public class GameController : MonoBehaviour
         //配列を初期化
         InitializeArray();
         finish_flg =0;
+
+        //アイテムを初期化
+        whiteMeteor = false;
+        whiteBlackHole = true;//白は初めからblackholeを使っている扱い
+        whiteZeroGravity = false;
+        blackMeteor = false;
+        blackBlackHole = false;
+        blackZeroGravity = false;
+
+        blackholebutton.interactable = false;//一ターン目は必ず白なので最初はブラックホールをfalseに
 
         //デバッグ用メソッド
         //DebugArray();
@@ -89,20 +115,137 @@ public class GameController : MonoBehaviour
                             //Squaresの値を更新
                             squares[z, x] = WHITE;
 
-                            //Stoneを出力
-                            GameObject stone = Instantiate(whiteStone);
-                            stone.transform.position = hit.collider.gameObject.transform.position;
-                            audioSource.PlayOneShot(sound);
-                            pos = stone.transform.position;
-                            pos.y += 1.0f;
-                            Instantiate(particleObject, pos, Quaternion.identity); //パーティクル用ゲームオブジェクト生成
+                            if(itemManager.meteor == true){
+                                //Meteorモード
+                                whiteMeteor = true;
+                                //??????????????????????????????????????????????????????
+                                GameObject stone = Instantiate(whiteStone);
+                                stone.transform.position = hit.collider.gameObject.transform.position;
+                                stone.tag = z + "" + x; //生成した碁石に座標情報をタグ付け
+                                Debug.Log(stone.tag);
+                                audioSource.PlayOneShot(sound);
+                                pos = stone.transform.position;
+                                pos.y += 1.0f;
+                                Instantiate(particleObject, pos, Quaternion.identity); //エフェクト生成
+
+                                //周囲の碁石を全破壊
+                                //周囲の碁石の座標取得
+                                List<string> aroundList = new List<string>();
+                                int meteorCounter = 0;
+                                if(z != 0){
+                                    aroundList.Add((z-1) + "" + (x));
+                                    meteorCounter++;
+                                }
+                                if(z != 9){
+                                    aroundList.Add((z+1) + "" + (x));
+                                    meteorCounter++;
+                                    
+                                }
+                                if(x != 0){
+                                    aroundList.Add((z) + "" + (x-1));
+                                    meteorCounter++;
+
+                                }
+                                if(x != 9){
+                                    aroundList.Add((z) + "" + (x+1));
+                                    meteorCounter++;
+
+                                }
+                                if( z != 0 && x != 0){
+                                    aroundList.Add((z-1) + "" + (x-1));
+                                    meteorCounter++;
+                                }
+                                if(z != 0 && x != 9){
+                                    aroundList.Add((z-1) + "" + (x+1));
+                                    meteorCounter++;
+                                }
+                                if(z != 9 && x != 0){
+                                    aroundList.Add((z+1) + "" + (x-1));
+                                    meteorCounter++;
+                                }
+                                if(z != 9 && x != 9){
+                                    aroundList.Add((z+1) + "" + (x+1));
+                                    meteorCounter++;
+
+                                }
+                                
+                                for(int i=0; i<meteorCounter ; i++){
+                                    GameObject aroundStone = GameObject.FindWithTag(aroundList[i]);
+                                    if(aroundStone != null){
+                                        string Coordinate = aroundList[i];
+                                        char firstCharacter = Coordinate[0];
+                                        int aroundZ = int.Parse(firstCharacter.ToString());//１文字目がZ座標
+                                        char secondCharacter = Coordinate[1];
+                                        int aroundX = int.Parse(secondCharacter.ToString());//2文字目がX座標
+        
+                                        squares[aroundZ, aroundX] = EMPTY;
+                                        Destroy(aroundStone);
+                                    }
+                                    
+                                }
 
 
+
+
+                            }else if(itemManager.zerogravity == true){
+                                //ZeroGravityモード
+                                whiteZeroGravity = true;
+                                //???????????????????????????????????????????????????????
+                                GameObject stone = Instantiate(whiteStone);
+                                stone.transform.position = hit.collider.gameObject.transform.position;
+                                stone.tag = z + "" + x; //生成した碁石に座標情報をタグ付け
+                                Debug.Log(stone.tag);
+                                audioSource.PlayOneShot(sound);
+                                pos = stone.transform.position;
+                                pos.y += 1.0f;
+                                Instantiate(particleObject, pos, Quaternion.identity); //エフェクト生成
+                            }else{
+                                //通常モード
+                                //Stoneを出力
+                                GameObject stone = Instantiate(whiteStone);
+                                stone.transform.position = hit.collider.gameObject.transform.position;
+                                stone.tag = z + "" + x; //生成した碁石に座標情報をタグ付け
+                                Debug.Log(stone.tag);
+                                audioSource.PlayOneShot(sound);
+                                pos = stone.transform.position;
+                                pos.y += 1.0f;
+                                Instantiate(particleObject, pos, Quaternion.identity); //エフェクト生成
+                            }
 
                             //Playerを交代
                             currentPlayer = BLACK;
                             message = "Black's Turn!";
                             textObject.text = "Black's Turn!";
+                            textObject.color = Color.black;
+
+
+                            //Itemを黒用に変える
+                            if(blackMeteor == true){
+                                meteorbutton.interactable = false;
+                            }else{
+                                meteorbutton.interactable = true;
+                            }
+
+                            if(blackBlackHole == true){
+                                blackholebutton.interactable = false;
+                            }else{
+                                blackholebutton.interactable = true;
+
+                            }
+
+                            if(blackZeroGravity == true){
+                                zerogravitybutton.interactable = false;
+                            }else{
+                                zerogravitybutton.interactable = true;
+                            }
+
+
+                            //Itemボタン使用可に変更し、Itemモードを終了する
+                            itembutton.interactable = true;
+                            itemManager.item = false;
+                            itemManager.meteor = false;
+                            itemManager.blackhole = false;
+                            itemManager.zerogravity = false;
                         }
                         //黒のターンのとき
                         else if (currentPlayer == BLACK)
@@ -111,19 +254,133 @@ public class GameController : MonoBehaviour
                             //Squaresの値を更新
                             squares[z, x] = BLACK;
 
-                            //Stoneを出力
-                            GameObject stone = Instantiate(blackStone);
-                            stone.transform.position = hit.collider.gameObject.transform.position;
-                            audioSource.PlayOneShot(sound);
-                            pos = stone.transform.position;
-                            pos.y += 1.0f;
-                            Instantiate(particleObject, pos, Quaternion.identity); //パーティクル用ゲームオブジェクト生成
 
+                            if(itemManager.meteor == true){
+                                //Meteorモード
+                                blackMeteor = true;
+                                //??????????????????????????????????????????????????????
+                                GameObject stone = Instantiate(blackStone);
+                                stone.transform.position = hit.collider.gameObject.transform.position;
+                                stone.tag = z + "" + x; //生成した碁石に座標情報をタグ付け
+                                Debug.Log(stone.tag);
+                                audioSource.PlayOneShot(sound);
+                                pos = stone.transform.position;
+                                pos.y += 1.0f;
+                                Instantiate(particleObject, pos, Quaternion.identity); //エフェクト生成
+
+                                //周囲の碁石を全破壊
+                                //周囲の碁石の座標取得
+                                List<string> aroundList = new List<string>();
+                                int meteorCounter = 0;
+                                if(z != 0){
+                                    aroundList.Add((z-1) + "" + (x));
+                                    meteorCounter++;
+                                }
+                                if(z != 9){
+                                    aroundList.Add((z+1) + "" + (x));
+                                    meteorCounter++;
+                                    
+                                }
+                                if(x != 0){
+                                    aroundList.Add((z) + "" + (x-1));
+                                    meteorCounter++;
+
+                                }
+                                if(x != 9){
+                                    aroundList.Add((z) + "" + (x+1));
+                                    meteorCounter++;
+
+                                }
+                                if( z != 0 && x != 0){
+                                    aroundList.Add((z-1) + "" + (x-1));
+                                    meteorCounter++;
+                                }
+                                if(z != 0 && x != 9){
+                                    aroundList.Add((z-1) + "" + (x+1));
+                                    meteorCounter++;
+                                }
+                                if(z != 9 && x != 0){
+                                    aroundList.Add((z+1) + "" + (x-1));
+                                    meteorCounter++;
+                                }
+                                if(z != 9 && x != 9){
+                                    aroundList.Add((z+1) + "" + (x+1));
+                                    meteorCounter++;
+
+                                }
+                                
+                                for(int i=0; i<meteorCounter ; i++){
+                                    GameObject aroundStone = GameObject.FindWithTag(aroundList[i]);
+                                    if(aroundStone != null){
+                                        string Coordinate = aroundList[i];
+                                        char firstCharacter = Coordinate[0];
+                                        int aroundZ = int.Parse(firstCharacter.ToString());//１文字目がZ座標
+                                        char secondCharacter = Coordinate[1];
+                                        int aroundX = int.Parse(secondCharacter.ToString());//2文字目がX座標
+        
+                                        squares[aroundZ, aroundX] = EMPTY;
+                                        Destroy(aroundStone);
+                                    }
+                                    
+                                }
+
+                            }else if(itemManager.zerogravity == true){
+                                //ZeroGravityモード
+                                whiteZeroGravity = true;
+                                //???????????????????????????????????????????????????????
+                                GameObject stone = Instantiate(blackStone);
+                                stone.transform.position = hit.collider.gameObject.transform.position;
+                                stone.tag = z + "" + x; //生成した碁石に座標情報をタグ付け
+                                Debug.Log(stone.tag);
+                                audioSource.PlayOneShot(sound);
+                                pos = stone.transform.position;
+                                pos.y += 1.0f;
+                                Instantiate(particleObject, pos, Quaternion.identity); //エフェクト生成
+                            }else{
+                                //通常モード
+                                //Stoneを出力
+                                GameObject stone = Instantiate(blackStone);
+                                stone.transform.position = hit.collider.gameObject.transform.position;
+                                stone.tag = z + "" + x; //生成した碁石に座標情報をタグ付け
+                                Debug.Log(stone.tag);
+                                audioSource.PlayOneShot(sound);
+                                pos = stone.transform.position;
+                                pos.y += 1.0f;
+                                Instantiate(particleObject, pos, Quaternion.identity); //エフェクト生成
+                            }    
 
                             //Playerを交代
                             currentPlayer = WHITE;
                             message = "White's Turn!";
                             textObject.text = "White's Turn!";
+                            textObject.color = Color.white;
+
+                            //Itemを白用に変える
+                            if(whiteMeteor == true){
+                                meteorbutton.interactable = false;
+                            }else{
+                                meteorbutton.interactable = true;
+                            }
+
+                            if(whiteBlackHole == true){
+                                blackholebutton.interactable = false;
+                            }else{
+                                blackholebutton.interactable = true;
+                            }
+
+                            if(whiteZeroGravity == true){
+                                zerogravitybutton.interactable = false;
+                            }else{
+                                zerogravitybutton.interactable = true;
+
+                            }
+
+                            //Itemボタン使用可に変更し、Itemモードを終了する
+                            itembutton.interactable = true;
+                            itemManager.item = false;
+                            itemManager.meteor = false;
+                            itemManager.blackhole = false;
+                            itemManager.zerogravity = false;
                         }
                     }
                 }
@@ -164,6 +421,8 @@ public class GameController : MonoBehaviour
         }
         
     }
+
+    
 
     //配列情報を初期化する
     private void InitializeArray()
