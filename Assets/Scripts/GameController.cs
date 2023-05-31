@@ -36,6 +36,7 @@ public class GameController : MonoBehaviour
     public GameObject particleObject2;//勝った時のエフェクト
     public GameObject particleObject3;//勝った時のエフェクト
     public GameObject particleObject4;//勝った時のエフェクト
+    public GameObject particleObject5;//ブラックホールのエフェクト
     private Vector3 pos;
     public int finish_flg =0;
     public string message="White's Turn!";
@@ -199,6 +200,111 @@ public class GameController : MonoBehaviour
                                 pos = stone.transform.position;
                                 pos.y += 1.0f;
                                 Instantiate(particleObject, pos, Quaternion.identity); //エフェクト生成
+
+                                //周囲の碁石をランダムに再配置
+                                //周囲の碁石の座標取得
+                                List<string> aroundList = new List<string>();
+                                int meteorCounter = 0;
+                                //List<int> aroundCheck = new List<string>();
+                                if(z != 0){
+                                    aroundList.Add((z-1) + "" + (x));
+                                    //aroundCheck.Add((z-1) + "" + (x));
+                                    meteorCounter++;
+                                    
+                                }
+                                if(z != 9){
+                                    aroundList.Add((z+1) + "" + (x));
+                                    meteorCounter++;
+                                    
+                                }
+                                if(x != 0){
+                                    aroundList.Add((z) + "" + (x-1));
+                                    meteorCounter++;
+
+                                }
+                                if(x != 9){
+                                    aroundList.Add((z) + "" + (x+1));
+                                    meteorCounter++;
+
+                                }
+                                if( z != 0 && x != 0){
+                                    aroundList.Add((z-1) + "" + (x-1));
+                                    meteorCounter++;
+                                }
+                                if(z != 0 && x != 9){
+                                    aroundList.Add((z-1) + "" + (x+1));
+                                    meteorCounter++;
+                                }
+                                if(z != 9 && x != 0){
+                                    aroundList.Add((z+1) + "" + (x-1));
+                                    meteorCounter++;
+                                }
+                                if(z != 9 && x != 9){
+                                    aroundList.Add((z+1) + "" + (x+1));
+                                    meteorCounter++;
+
+                                }
+                                int whiteCounter = 0;
+                                int blackCounter = 0;
+                                for(int i=0; i<meteorCounter ; i++){
+                                    GameObject aroundStone = GameObject.FindWithTag(aroundList[i]);
+                                    if(aroundStone != null){
+                                        string Coordinate = aroundList[i];
+                                        char firstCharacter = Coordinate[0];
+                                        int aroundZ = int.Parse(firstCharacter.ToString());//１文字目がZ座標
+                                        char secondCharacter = Coordinate[1];
+                                        int aroundX = int.Parse(secondCharacter.ToString());//2文字目がX座標
+                                        
+                                        if(squares[aroundZ, aroundX]==WHITE){
+                                            whiteCounter++;
+                                        }
+                                        if(squares[aroundZ, aroundX]==BLACK){
+                                            blackCounter++;
+                                        }
+                                        squares[aroundZ, aroundX] = EMPTY;
+                                        Destroy(aroundStone);
+                                    }
+                                }
+                                List<int> numbers = new List<int>();
+                                for (int i = 0; i < meteorCounter; i++) {
+                                    numbers.Add(i);
+                                }
+                                Debug.Log("whiteCounter:"+whiteCounter);
+                                Debug.Log("blackCounter:"+blackCounter);
+
+                                Debug.Log("numbers.Count:"+numbers.Count);
+                                int stoneCounter = whiteCounter + blackCounter;
+                                while (stoneCounter-- > 0) {
+ 
+                                    int index = Random.Range(0, numbers.Count);
+                                    int ransu = numbers[index];
+                                    Debug.Log("stoneCounter:"+stoneCounter);
+                                    Debug.Log("ransu:"+ransu);
+                                    numbers.RemoveAt(index);
+                                    string Coordinate = aroundList[ransu];
+                                    char firstCharacter = Coordinate[0];
+                                    int aroundZ = int.Parse(firstCharacter.ToString());//１文字目がZ座標
+                                    char secondCharacter = Coordinate[1];
+                                    int aroundX = int.Parse(secondCharacter.ToString());//2文字目がX座標
+                                    if(whiteCounter>0){
+                                        GameObject zeroGravityStone = Instantiate(whiteStone);
+                                        zeroGravityStone.transform.position = new Vector3(aroundX,0,aroundZ);
+                                        zeroGravityStone.tag = aroundZ + "" + aroundX;
+                                        whiteCounter--;
+                                        squares[aroundZ, aroundX]=WHITE;
+                                    }else if(blackCounter>0){
+                                        GameObject zeroGravityStone = Instantiate(blackStone);
+                                        zeroGravityStone.transform.position = new Vector3(aroundX,0,aroundZ);
+                                        zeroGravityStone.tag = aroundZ + "" + aroundX;
+                                        blackCounter--;
+                                        squares[aroundZ, aroundX]=BLACK;
+                                    }
+                                    
+                                }
+                                
+
+
+
                             }else{
                                 //通常モード
                                 //Stoneを出力
@@ -326,7 +432,7 @@ public class GameController : MonoBehaviour
 
                             }else if(itemManager.zerogravity == true){
                                 //ZeroGravityモード
-                                whiteZeroGravity = true;
+                                blackZeroGravity = true;
                                 //???????????????????????????????????????????????????????
                                 GameObject stone = Instantiate(blackStone);
                                 stone.transform.position = hit.collider.gameObject.transform.position;
@@ -336,6 +442,166 @@ public class GameController : MonoBehaviour
                                 pos = stone.transform.position;
                                 pos.y += 1.0f;
                                 Instantiate(particleObject, pos, Quaternion.identity); //エフェクト生成
+
+                                //周囲の碁石をランダムに再配置
+                                //周囲の碁石の座標取得
+                                List<string> aroundList = new List<string>();
+                                int meteorCounter = 0;
+                                //List<int> aroundCheck = new List<string>();
+                                if(z != 0){
+                                    aroundList.Add((z-1) + "" + (x));
+                                    //aroundCheck.Add((z-1) + "" + (x));
+                                    meteorCounter++;
+                                    
+                                }
+                                if(z != 9){
+                                    aroundList.Add((z+1) + "" + (x));
+                                    meteorCounter++;
+                                    
+                                }
+                                if(x != 0){
+                                    aroundList.Add((z) + "" + (x-1));
+                                    meteorCounter++;
+
+                                }
+                                if(x != 9){
+                                    aroundList.Add((z) + "" + (x+1));
+                                    meteorCounter++;
+
+                                }
+                                if( z != 0 && x != 0){
+                                    aroundList.Add((z-1) + "" + (x-1));
+                                    meteorCounter++;
+                                }
+                                if(z != 0 && x != 9){
+                                    aroundList.Add((z-1) + "" + (x+1));
+                                    meteorCounter++;
+                                }
+                                if(z != 9 && x != 0){
+                                    aroundList.Add((z+1) + "" + (x-1));
+                                    meteorCounter++;
+                                }
+                                if(z != 9 && x != 9){
+                                    aroundList.Add((z+1) + "" + (x+1));
+                                    meteorCounter++;
+
+                                }
+                                int whiteCounter = 0;
+                                int blackCounter = 0;
+                                for(int i=0; i<meteorCounter ; i++){
+                                    GameObject aroundStone = GameObject.FindWithTag(aroundList[i]);
+                                    if(aroundStone != null){
+                                        string Coordinate = aroundList[i];
+                                        char firstCharacter = Coordinate[0];
+                                        int aroundZ = int.Parse(firstCharacter.ToString());//１文字目がZ座標
+                                        char secondCharacter = Coordinate[1];
+                                        int aroundX = int.Parse(secondCharacter.ToString());//2文字目がX座標
+                                        
+                                        if(squares[aroundZ, aroundX]==WHITE){
+                                            whiteCounter++;
+                                        }
+                                        if(squares[aroundZ, aroundX]==BLACK){
+                                            blackCounter++;
+                                        }
+                                        squares[aroundZ, aroundX] = EMPTY;
+                                        Destroy(aroundStone);
+                                    }
+                                }
+                                List<int> numbers = new List<int>();
+                                for (int i = 0; i < meteorCounter; i++) {
+                                    numbers.Add(i);
+                                }
+                                Debug.Log("whiteCounter:"+whiteCounter);
+                                Debug.Log("blackCounter:"+blackCounter);
+
+                                Debug.Log("numbers.Count:"+numbers.Count);
+                                int stoneCounter = whiteCounter + blackCounter;
+                                while (stoneCounter-- > 0) {
+ 
+                                    int index = Random.Range(0, numbers.Count);
+                                    int ransu = numbers[index];
+                                    Debug.Log("stoneCounter:"+stoneCounter);
+                                    Debug.Log("ransu:"+ransu);
+                                    numbers.RemoveAt(index);
+                                    string Coordinate = aroundList[ransu];
+                                    char firstCharacter = Coordinate[0];
+                                    int aroundZ = int.Parse(firstCharacter.ToString());//１文字目がZ座標
+                                    char secondCharacter = Coordinate[1];
+                                    int aroundX = int.Parse(secondCharacter.ToString());//2文字目がX座標
+                                    if(whiteCounter>0){
+                                        GameObject zeroGravityStone = Instantiate(whiteStone);
+                                        zeroGravityStone.transform.position = new Vector3(aroundX,0,aroundZ);
+                                        zeroGravityStone.tag = aroundZ + "" + aroundX;
+                                        whiteCounter--;
+                                        squares[aroundZ, aroundX]=WHITE;
+                                    }else if(blackCounter>0){
+                                        GameObject zeroGravityStone = Instantiate(blackStone);
+                                        zeroGravityStone.transform.position = new Vector3(aroundX,0,aroundZ);
+                                        zeroGravityStone.tag = aroundZ + "" + aroundX;
+                                        blackCounter--;
+                                        squares[aroundZ, aroundX]=BLACK;
+                                    }
+                                    
+                                }
+                            }else if(itemManager.blackhole == true){
+                                blackBlackHole = true;
+                                //???????????????????????????????????????????????????????
+                                GameObject stone = Instantiate(blackStone);
+                                stone.transform.position = hit.collider.gameObject.transform.position;
+                                stone.tag = z + "" + x; //生成した碁石に座標情報をタグ付け
+                                Debug.Log(stone.tag);
+                                audioSource.PlayOneShot(sound);
+                                pos = stone.transform.position;
+                                pos.y += 1.0f;
+                                Instantiate(particleObject5, pos, Quaternion.identity); //エフェクト生成
+
+                                //周囲の碁石をランダムに再配置
+                                //周囲の碁石の座標取得
+                                List<string> aroundList = new List<string>();
+                                int meteorCounter = 0;
+                                //List<int> aroundCheck = new List<string>();
+                                if(z != 0){
+                                    aroundList.Add((z-1) + "" + (x)+"masu");
+                                    meteorCounter++;
+                                    
+                                }
+                                if(z != 9){
+                                    aroundList.Add((z+1) + "" + (x)+"masu");
+                                    meteorCounter++;
+                                    
+                                }
+                                if(x != 0){
+                                    aroundList.Add((z) + "" + (x-1)+"masu");
+                                    meteorCounter++;
+
+                                }
+                                if(x != 9){
+                                    aroundList.Add((z) + "" + (x+1)+"masu");
+                                    meteorCounter++;
+
+                                }
+                                if( z != 0 && x != 0){
+                                    aroundList.Add((z-1) + "" + (x-1)+"masu");
+                                    meteorCounter++;
+                                }
+                                if(z != 0 && x != 9){
+                                    aroundList.Add((z-1) + "" + (x+1)+"masu");
+                                    meteorCounter++;
+                                }
+                                if(z != 9 && x != 0){
+                                    aroundList.Add((z+1) + "" + (x-1)+"masu");
+                                    meteorCounter++;
+                                }
+                                if(z != 9 && x != 9){
+                                    aroundList.Add((z+1) + "" + (x+1)+"masu");
+                                    meteorCounter++;
+
+                                }
+                                for(int i=0; i<meteorCounter ; i++){
+                                    GameObject aroundMasu = GameObject.FindWithTag(aroundList[i]);
+                                    aroundMasu.SetActive(false);
+                                }
+
                             }else{
                                 //通常モード
                                 //Stoneを出力
@@ -392,11 +658,13 @@ public class GameController : MonoBehaviour
                     Debug.Log("白の勝ち！！！");
                     message = "White Win!!";
                     textObject.text = "White Win!";
+                    textObject.color = Color.red;
                 }
                 if(CheckStone(BLACK)){
                     Debug.Log("黒の勝ち！！！");
                     message = "Black Win!!";
                     textObject.text = "Black Win!";
+                    textObject.color = Color.red;
                 }
 
                 //os.y -= 1.0f;
@@ -472,6 +740,8 @@ public class GameController : MonoBehaviour
                     //countにsquaresの値を格納する
                     count++;
                 }
+
+
 
                 
 
