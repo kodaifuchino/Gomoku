@@ -30,6 +30,12 @@ public class GameController : MonoBehaviour
     [SerializeField] float pitchRange = 0.1f;
     public AudioClip sound;//石を置くときの音
     public AudioClip sound2;//勝った時の音
+    public AudioClip sound3;//隕石着弾の音
+    public AudioClip sound4;//ZeroGravityの音
+    public AudioClip sound5;//BlackHoleの音
+
+
+
     AudioSource audioSource;
 
     public GameObject particleObject;//石を置くときのエフェクト
@@ -37,6 +43,10 @@ public class GameController : MonoBehaviour
     public GameObject particleObject3;//勝った時のエフェクト
     public GameObject particleObject4;//勝った時のエフェクト
     public GameObject particleObject5;//ブラックホールのエフェクト
+    public GameObject particleObject6;//隕石のエフェクト
+    public GameObject particleObject7;//ZeroGravityのエフェクト
+
+
     private Vector3 pos;
     public int finish_flg =0;
     public string message="White's Turn!";
@@ -124,10 +134,10 @@ public class GameController : MonoBehaviour
                                 stone.transform.position = hit.collider.gameObject.transform.position;
                                 stone.tag = z + "" + x; //生成した碁石に座標情報をタグ付け
                                 Debug.Log(stone.tag);
-                                audioSource.PlayOneShot(sound);
+                                audioSource.PlayOneShot(sound3);
                                 pos = stone.transform.position;
                                 pos.y += 1.0f;
-                                Instantiate(particleObject, pos, Quaternion.identity); //エフェクト生成
+                                Instantiate(particleObject6, pos, Quaternion.identity); //エフェクト生成
 
                                 //周囲の碁石を全破壊
                                 //周囲の碁石の座標取得
@@ -196,10 +206,10 @@ public class GameController : MonoBehaviour
                                 stone.transform.position = hit.collider.gameObject.transform.position;
                                 stone.tag = z + "" + x; //生成した碁石に座標情報をタグ付け
                                 Debug.Log(stone.tag);
-                                audioSource.PlayOneShot(sound);
+                                audioSource.PlayOneShot(sound4);
                                 pos = stone.transform.position;
                                 pos.y += 1.0f;
-                                Instantiate(particleObject, pos, Quaternion.identity); //エフェクト生成
+                                Instantiate(particleObject7, pos, Quaternion.identity); //エフェクト生成
 
                                 //周囲の碁石をランダムに再配置
                                 //周囲の碁石の座標取得
@@ -369,10 +379,10 @@ public class GameController : MonoBehaviour
                                 stone.transform.position = hit.collider.gameObject.transform.position;
                                 stone.tag = z + "" + x; //生成した碁石に座標情報をタグ付け
                                 Debug.Log(stone.tag);
-                                audioSource.PlayOneShot(sound);
+                                audioSource.PlayOneShot(sound3);
                                 pos = stone.transform.position;
                                 pos.y += 1.0f;
-                                Instantiate(particleObject, pos, Quaternion.identity); //エフェクト生成
+                                Instantiate(particleObject6, pos, Quaternion.identity); //エフェクト生成
 
                                 //周囲の碁石を全破壊
                                 //周囲の碁石の座標取得
@@ -438,10 +448,10 @@ public class GameController : MonoBehaviour
                                 stone.transform.position = hit.collider.gameObject.transform.position;
                                 stone.tag = z + "" + x; //生成した碁石に座標情報をタグ付け
                                 Debug.Log(stone.tag);
-                                audioSource.PlayOneShot(sound);
+                                audioSource.PlayOneShot(sound4);
                                 pos = stone.transform.position;
                                 pos.y += 1.0f;
-                                Instantiate(particleObject, pos, Quaternion.identity); //エフェクト生成
+                                Instantiate(particleObject7, pos, Quaternion.identity); //エフェクト生成
 
                                 //周囲の碁石をランダムに再配置
                                 //周囲の碁石の座標取得
@@ -550,7 +560,7 @@ public class GameController : MonoBehaviour
                                 stone.transform.position = hit.collider.gameObject.transform.position;
                                 stone.tag = z + "" + x; //生成した碁石に座標情報をタグ付け
                                 Debug.Log(stone.tag);
-                                audioSource.PlayOneShot(sound);
+                                audioSource.PlayOneShot(sound5);
                                 pos = stone.transform.position;
                                 pos.y += 1.0f;
                                 Instantiate(particleObject5, pos, Quaternion.identity); //エフェクト生成
