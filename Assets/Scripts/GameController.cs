@@ -660,34 +660,38 @@ public class GameController : MonoBehaviour
                         }
                     }
                 }
+                //DebugArray();
+                //碁石が揃っているかどうか確認する
+                if (CheckStone(WHITE) || CheckStone(BLACK)){
+                    if(CheckStone(WHITE)){
+                        Debug.Log("白の勝ち！！！");
+                        message = "White Win!!";
+                        textObject.text = "White Win!";
+                        textObject.color = Color.red;
+                    }
+                    if(CheckStone(BLACK)){
+                        Debug.Log("黒の勝ち！！！");
+                        message = "Black Win!!";
+                        textObject.text = "Black Win!";
+                        textObject.color = Color.red;
+                    }
+
+                    //os.y -= 1.0f;
+                    //Instantiate(particleObject2, pos, Quaternion.identity);
+                    //Instantiate(particleObject3, pos, Quaternion.identity);
+                    Quaternion rotation = Quaternion.Euler(270, 0, 0);  // Y軸周りに45度回転
+                    Instantiate(particleObject4, pos, rotation);
+                    audioSource.PlayOneShot(sound2);
+
+                    finish_flg = 1;//ゲーム終了を示す
+
+                    return;
+                }
             }
 
-            //碁石が揃っているかどうか確認する
-            if (CheckStone(WHITE) || CheckStone(BLACK)){
-                if(CheckStone(WHITE)){
-                    Debug.Log("白の勝ち！！！");
-                    message = "White Win!!";
-                    textObject.text = "White Win!";
-                    textObject.color = Color.red;
-                }
-                if(CheckStone(BLACK)){
-                    Debug.Log("黒の勝ち！！！");
-                    message = "Black Win!!";
-                    textObject.text = "Black Win!";
-                    textObject.color = Color.red;
-                }
+            
 
-                //os.y -= 1.0f;
-                //Instantiate(particleObject2, pos, Quaternion.identity);
-                //Instantiate(particleObject3, pos, Quaternion.identity);
-                Quaternion rotation = Quaternion.Euler(270, 0, 0);  // Y軸周りに45度回転
-                Instantiate(particleObject4, pos, rotation);
-                audioSource.PlayOneShot(sound2);
-
-                finish_flg = 1;//ゲーム終了を示す
-
-                return;
-            }
+            
             
 
             //マウスがクリックされたとき
@@ -867,6 +871,14 @@ public class GameController : MonoBehaviour
 
             for (int j = i; j < 10; j++)
             {
+                Debug.Log("i:"+i);
+                Debug.Log("j:"+j);
+                Debug.Log("squares[z,x]:"+squares[j, down]);
+
+                Debug.Log("count:"+count);
+                Debug.Log("down:"+down);
+                
+
                 //squaresの値が空のとき
                 if (squares[j, down] == EMPTY || squares[j, down] != color)
                 {
@@ -877,6 +889,7 @@ public class GameController : MonoBehaviour
                 {
                     count++;
                 }
+                //Debug.Log();
 
                 //countの値が5になったとき
                 if (count == 5)
