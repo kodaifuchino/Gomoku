@@ -860,6 +860,49 @@ public class GameController : MonoBehaviour
             }
         }
 
+        //斜め(右上がり  右下)
+        for (int i = 0; i < 10; i++)
+        {
+            //上移動用
+            int up = i;
+
+            for (int j = 0; j < 10; j++)
+            {
+                //squaresの値が空のとき
+                if (squares[j, up] == EMPTY || squares[j, up] != color)
+                {
+                    //countを初期化する
+                    count = 0;
+                }
+                else
+                {
+                    count++;
+                }
+
+                //countの値が5になったとき
+                if (count == 5)
+                {
+                    //白のとき
+                    if (color == WHITE)
+                    {
+                        //Debug.Log("白の勝ち！！！");
+                    }
+                    //黒のとき
+                    else
+                    {
+                        //Debug.Log("黒の勝ち！！！");
+                    }
+
+                    return true;
+                }
+
+                up++;
+                if(up==10){
+                    break;
+                }
+            }
+        }
+
         //countの値を初期化
         count = 0;
 
@@ -871,12 +914,6 @@ public class GameController : MonoBehaviour
 
             for (int j = i; j < 10; j++)
             {
-                Debug.Log("i:"+i);
-                Debug.Log("j:"+j);
-                Debug.Log("squares[z,x]:"+squares[j, down]);
-
-                Debug.Log("count:"+count);
-                Debug.Log("down:"+down);
                 
 
                 //squaresの値が空のとき
@@ -909,6 +946,58 @@ public class GameController : MonoBehaviour
                 }
 
                 down--;
+            }
+        }
+
+        //斜め(右下がり 左下)
+        for (int i = 9; i > 0; i--)
+        {
+            //下移動用
+            int down = i;
+
+            for (int j = 0; j < 10; j++)
+            {
+                // Debug.Log("i:"+i);
+                // Debug.Log("j:"+j);
+                // Debug.Log("squares[z,x]:"+squares[j, down]);
+
+                // Debug.Log("count:"+count);
+                // Debug.Log("down:"+down);
+                
+
+                //squaresの値が空のとき
+                if (squares[j, down] == EMPTY || squares[j, down] != color)
+                {
+                    //countを初期化する
+                    count = 0;
+                }
+                else
+                {
+                    count++;
+                }
+                //Debug.Log();
+
+                //countの値が5になったとき
+                if (count == 5)
+                {
+                    //白のとき
+                    if (color == WHITE)
+                    {
+                        //Debug.Log("白の勝ち！！！");
+                    }
+                    //黒のとき
+                    else
+                    {
+                        //Debug.Log("黒の勝ち！！！");
+                    }
+
+                    return true;
+                }
+
+                down--;
+                if(down == -1){
+                    break;
+                }
             }
         }
 
